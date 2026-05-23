@@ -1,8 +1,8 @@
 # Lua Games Card Bridge
 
-Millennium plugin that locally bridges Lua games into Steam's native badge and visual Trading Cards UI paths.
+plugin that locally bridges Lua games into Steam's native badge and Trading Cards UI paths.
 
-The goal is to make Lua game card pages feel consistent with normal Steam games while staying local and visual-only.
+The goal is to make Lua game card pages feel consistent with normal Steam games while staying local.
 
 ## Features
 
