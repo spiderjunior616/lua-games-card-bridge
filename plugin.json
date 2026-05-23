@@ -3,7 +3,7 @@
   "name": "luatools-card-helper",
   "common_name": "Lua Games Card Bridge",
   "description": "Local SteamUI bridge that lets Lua games use Steam's native badge and visual Trading Cards paths.",
-  "version": "1.3.45",
+  "version": "1.3.46",
   "useBackend": true,
   "backend": "backend",
   "include": [

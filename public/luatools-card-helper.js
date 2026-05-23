@@ -639,6 +639,25 @@
 
   function findBadgeIconFromGamecardsHTML(appid, html) {
     const source = String(html || "").replace(/\\\//g, "/");
+    try {
+      const doc = new DOMParser().parseFromString(source, "text/html");
+      const selectors = [
+        ".badge_gamecard_page .badge_info_image img",
+        ".badge_row.depressed .badge_info_image img",
+        ".badge_info_image img.badge_icon",
+        ".badge_info_image img",
+        "img.badge_icon",
+      ];
+      for (const selector of selectors) {
+        const image = doc.querySelector(selector);
+        const icon = normalizeImageURL(
+          image && (image.getAttribute("src") || image.getAttribute("data-src")),
+          appid,
+        );
+        if (icon) return icon;
+      }
+    } catch (_) {}
+
     const escaped = String(appid).replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     const patterns = [
       new RegExp(`https?:\\/\\/[^"'<>\\s]+\\/steamcommunity\\/public\\/images\\/items\\/${escaped}\\/[a-f0-9]{40}\\.png`, "gi"),
@@ -2424,10 +2443,33 @@
     return true;
   }
 
-  function ensureCommunityBadgesIcon(row, payload) {
+  function communityBadgesIconURL(appid, payload, level) {
     const craft = payload && payload.craft && typeof payload.craft === "object" ? payload.craft : {};
     const badge = payload && payload.badge && typeof payload.badge === "object" ? payload.badge : {};
     const nextBadge = craft.nextBadge && typeof craft.nextBadge === "object" ? craft.nextBadge : {};
+    const levels = Array.isArray(payload && payload.badgeLevels) ? payload.badgeLevels : [];
+    const exactLevel = levels.find((item) => readNumber(item && item.level) === level);
+    const anyLevelWithIcon = levels.find((item) => normalizeImageURL(item && item.iconURL, appid));
+    return normalizeImageURL(badge.iconURL, appid) ||
+      normalizeImageURL(exactLevel && exactLevel.iconURL, appid) ||
+      normalizeImageURL(nextBadge.iconURL, appid) ||
+      normalizeImageURL(anyLevelWithIcon && anyLevelWithIcon.iconURL, appid) ||
+      normalizeImageURL(STATE.badgeIconCache.get(appid), appid);
+  }
+
+  function requestCommunityBadgesIconFallback(appid, payload) {
+    if (!appid) return;
+    fetchBadgeIconFromGamecardsPage(appid).then((icon) => {
+      if (!icon) return;
+      const badge = payload && payload.badge && typeof payload.badge === "object" ? payload.badge : null;
+      if (badge && !badge.iconURL) badge.iconURL = icon;
+      scheduleCommunityBadgesPatch("badge-icon", true);
+    });
+  }
+
+  function ensureCommunityBadgesIcon(row, appid, payload) {
+    const craft = payload && payload.craft && typeof payload.craft === "object" ? payload.craft : {};
+    const badge = payload && payload.badge && typeof payload.badge === "object" ? payload.badge : {};
     const level = Math.max(0, readNumber(craft.level || badge.level));
 
     let holder = row.querySelector(".ltch-community-badges-icon") ||
@@ -2459,8 +2501,11 @@
       return true;
     }
 
-    const iconURL = String((badge.iconURL || nextBadge.iconURL) || "").trim();
-    if (!iconURL) return false;
+    const iconURL = communityBadgesIconURL(appid, payload, level);
+    if (!iconURL) {
+      requestCommunityBadgesIconFallback(appid, payload);
+      return false;
+    }
 
     holder.classList.remove("badge_empty", "badge_empty_left", "badge_empty_right", "ltch-community-badges-empty-icon");
     holder.classList.remove("ltch-community-badges-preview-icon");
@@ -2548,7 +2593,7 @@
     row.dataset.ltchCommunityBadgesAppid = String(appid);
     row.dataset.ltchCommunityBadgesMode = payload.visualDropMode || getVisualDropMode();
 
-    const patchedIcon = ensureCommunityBadgesIcon(row, payload);
+    const patchedIcon = ensureCommunityBadgesIcon(row, appid, payload);
     const patchedStatus = ensureCommunityBadgesStatus(row, payload);
     const patchedAction = ensureCommunityBadgesAction(row, payload, appid);
     const patchedCopy = patchCommunityBadgesProgressCopy(row, payload);
