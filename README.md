@@ -28,20 +28,3 @@ The goal is to make Lua game card pages feel consistent with normal Steam games 
 ### Steam Library Cards Section
 
 ![Steam Library cards section](docs/images/library-cards-example.png)
-
-## What This Does Not Do
-
-- It does not edit Steam entitlements.
-- It does not create inventory items or force real card drops.
-- It does not craft real badges or grant real XP.
-- It does not fake earned-card activity.
-- It does not modify installed Lua game plugins or other installed plugins.
-
-Card drops are decided by Steam's backend. This bridge only changes the local SteamUI side: discovery, badge data loading, native card-section visibility, and visual-only card ownership inside the Library cards section for Lua games that already have official Steam Trading Cards.
-
-## Privacy and Safety Notes
-
-- The plugin does not include account IDs, profile URLs, local user paths, API keys, tokens, or credentials.
-- Runtime cache files are written under Steam's local config folder and are ignored by Git.
-- Public backend responses avoid returning local filesystem paths.
-- Image URLs accepted from cached Steam badge data are limited to Steam-owned domains.
