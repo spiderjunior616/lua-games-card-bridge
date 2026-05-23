@@ -1,0 +1,14 @@
+{
+  "$schema": "https://raw.githubusercontent.com/SteamClientHomebrew/Millennium/main/src/sys/plugin-schema.json",
+  "name": "luatools-card-helper",
+  "common_name": "Lua Games Card Bridge",
+  "description": "Local SteamUI bridge that lets Lua games use Steam's native badge and visual Trading Cards paths.",
+  "version": "1.3.45",
+  "useBackend": true,
+  "backend": "backend",
+  "include": [
+    ".millennium",
+    "backend",
+    "public"
+  ]
+}

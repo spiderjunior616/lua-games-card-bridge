@@ -1,0 +1,8 @@
+__pycache__/
+*.py[cod]
+*.log
+.DS_Store
+Thumbs.db
+luatools-card-helper-settings.json
+luatools-card-helper-craft-state.json
+luatools-card-helper-visual-cache.json
