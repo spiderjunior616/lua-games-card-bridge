@@ -25,10 +25,6 @@ The goal is to make Lua game card pages feel consistent with normal Steam games 
 
 ![Steam Community badges list](docs/images/badges-list-example.png)
 
-### Max Level Badge Row
-
-![Steam Community max level badge row](docs/images/max-level-badge-example.png)
-
 ### Steam Library Cards Section
 
 ![Steam Library cards section](docs/images/library-cards-example.png)
